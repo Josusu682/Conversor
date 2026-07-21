@@ -114,7 +114,10 @@ function registrarHistorial(valor, origen, destino, resultado) {
 
 function actualizarVistaHistorial() {
     const lista = document.getElementById("lista-historial");
+    const contador = document.getElementById("contador-historial");
     if (!lista) return;
+
+    if (contador) contador.innerText = historialConversiones.length;
 
     lista.innerHTML = "";
     historialConversiones.slice().reverse().forEach(item => {
@@ -124,21 +127,35 @@ function actualizarVistaHistorial() {
     });
 }
 
+function limpiarHistorial() {
+    if (historialConversiones.length === 0) {
+        alert("El historial ya está vacío.");
+        return;
+    }
+    if (confirm("¿Estás seguro de que deseas borrar todo el historial?")) {
+        historialConversiones.length = 0;
+        actualizarVistaHistorial();
+    }
+}
+
 function exportarCSV() {
     if (historialConversiones.length === 0) {
         alert("No hay conversiones en el historial para exportar.");
         return;
     }
 
-    let csvContent = "data:text/csv;charset=utf-8,Valor,Origen,Resultado,Destino,Hora\n";
+    let csvContent = "\uFEFFValor;Origen;Resultado;Destino;Hora\n";
 
     historialConversiones.forEach(item => {
-        csvContent += `${item.valor},${item.origen},${item.resultado},${item.destino},${item.fecha}\n`;
+        const resultadoLimpio = Number(item.resultado).toFixed(4);
+        csvContent += `${item.valor};${item.origen};${resultadoLimpio};${item.destino};${item.fecha}\n`;
     });
 
-    const encodedUri = encodeURI(csvContent);
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
     const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
+    link.setAttribute("href", url);
     link.setAttribute("download", "historial_conversiones.csv");
     document.body.appendChild(link);
     link.click();
