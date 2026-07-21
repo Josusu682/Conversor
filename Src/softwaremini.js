@@ -98,7 +98,52 @@ function actualizarSelectores() {
     mostrarResultado("Resultado:");
     actualizarFuenteMonedas(esMoneda);
 }
+//HISTORIAL Y EXPORTACIÓN A CSV 
+const historialConversiones = [];
 
+function registrarHistorial(valor, origen, destino, resultado) {
+    historialConversiones.push({
+        valor: Number(valor),
+        origen: origen.toUpperCase(),
+        resultado: Number(resultado),
+        destino: destino.toUpperCase(),
+        fecha: new Date().toLocaleTimeString()
+    });
+    actualizarVistaHistorial();
+}
+
+function actualizarVistaHistorial() {
+    const lista = document.getElementById("lista-historial");
+    if (!lista) return;
+
+    lista.innerHTML = "";
+    historialConversiones.slice().reverse().forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = `${item.valor} ${item.origen} = ${formatearNumero(item.resultado)} ${item.destino} (${item.fecha})`;
+        lista.appendChild(li);
+    });
+}
+
+function exportarCSV() {
+    if (historialConversiones.length === 0) {
+        alert("No hay conversiones en el historial para exportar.");
+        return;
+    }
+
+    let csvContent = "data:text/csv;charset=utf-8,Valor,Origen,Resultado,Destino,Hora\n";
+
+    historialConversiones.forEach(item => {
+        csvContent += `${item.valor},${item.origen},${item.resultado},${item.destino},${item.fecha}\n`;
+    });
+
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "historial_conversiones.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+}
 function convertir() {
     const valor = document.getElementById("valor").value;
     const origen = document.getElementById("origen").value;
@@ -112,6 +157,7 @@ function convertir() {
         mostrarResultado(
             `${valorFormateado} ${origen.toUpperCase()} = ${resultadoFormateado} ${destino.toUpperCase()}`
         );
+        registrarHistorial(valor, origen, destino, resultado);
     } catch (error) {
         mostrarResultado(error.message);
     }
