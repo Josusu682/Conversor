@@ -1,10 +1,12 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Conversor de Unidades y Monedas</title>
     <link rel="stylesheet" href="Style/conversor.css">
 </head>
+
 <body>
 
     <div class="contenedor">
@@ -34,10 +36,19 @@
 
         <h2 id="resultado">Resultado:</h2>
         <p id="fuente-monedas"></p>
+
+        <!-- NUEVOS ELEMENTOS-->
+        <div class="historial-seccion" style="margin-top: 20px;">
+            <h3>Historial de Conversiones</h3>
+            <button onclick="exportarCSV()" id="btn-exportar" style="margin-bottom: 10px;">Exportar a CSV</button>
+            <ul id="lista-historial" style="max-height: 150px; overflow-y: auto; text-align: left; padding-left: 20px;">
+            </ul>
+        </div>
     </div>
 
     <script src="Src/unidades.js"></script>
     <script src="Src/conversiones.js"></script>
     <script src="Src/softwaremini.js"></script>
 </body>
+
 </html>
