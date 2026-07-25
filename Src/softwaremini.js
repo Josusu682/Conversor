@@ -99,7 +99,11 @@ function actualizarSelectores() {
     actualizarFuenteMonedas(esMoneda);
 }
 //HISTORIAL Y EXPORTACIÓN A CSV 
-const historialConversiones = [];
+let historialConversiones = JSON.parse(localStorage.getItem("historial_conversiones")) || [];
+
+function guardarEnStorage() {
+    localStorage.setItem("historial_conversiones", JSON.stringify(historialConversiones));
+}
 
 function registrarHistorial(valor, origen, destino, resultado) {
     historialConversiones.push({
@@ -109,6 +113,7 @@ function registrarHistorial(valor, origen, destino, resultado) {
         destino: destino.toUpperCase(),
         fecha: new Date().toLocaleTimeString()
     });
+    guardarEnStorage();
     actualizarVistaHistorial();
 }
 
@@ -134,6 +139,7 @@ function limpiarHistorial() {
     }
     if (confirm("¿Estás seguro de que deseas borrar todo el historial?")) {
         historialConversiones.length = 0;
+        guardarEnStorage();
         actualizarVistaHistorial();
     }
 }
@@ -147,8 +153,7 @@ function exportarCSV() {
     let csvContent = "\uFEFFValor;Origen;Resultado;Destino;Hora\n";
 
     historialConversiones.forEach(item => {
-        const resultadoLimpio = Number(item.resultado).toFixed(4);
-        csvContent += `${item.valor};${item.origen};${resultadoLimpio};${item.destino};${item.fecha}\n`;
+        csvContent += `${item.valor};${item.origen};${item.resultado};${item.destino};${item.fecha}\n`;
     });
 
     const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
@@ -161,6 +166,7 @@ function exportarCSV() {
     link.click();
     document.body.removeChild(link);
 }
+
 function convertir() {
     const valor = document.getElementById("valor").value;
     const origen = document.getElementById("origen").value;
@@ -197,4 +203,5 @@ document.addEventListener("DOMContentLoaded", () => {
     tipoConversion.addEventListener("change", actualizarSelectores);
     categoria.addEventListener("change", actualizarSelectores);
     actualizarSelectores();
+    actualizarVistaHistorial();
 });
